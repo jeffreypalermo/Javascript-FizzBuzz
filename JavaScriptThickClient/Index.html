@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="/Content/base.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/layout.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/skeleton.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/Scripts/jquery-1.6.2.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery-ui-1.8.11.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery.validate.js"></script>
+    <script type="text/javascript" src="/Scripts/knockout-2.0.0.debug.js"></script>
+    <script type="text/javascript" src="/Scripts/modernizr-2.0.6-development-only.js"></script>
+    <script src="Js/Engine/Handler.js" type="text/javascript"></script>
+    <script src="Js/Engine/FizzBuzzCommandHandler.js" type="text/javascript"></script>
+    <script src="Js/Engine/FizzBuzzCommand.js" type="text/javascript"></script>
+    <script src="Js/Engine/ApplicationBus.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/Js/Engine/Configuration.js"></script>
+    <script type="text/javascript" src="/Js/Engine/Appender.js"></script>
+    <script type="text/javascript" src="/Js/Engine/Runner.js"></script>
+    <script type="text/javascript" src="/Js/Program.js"></script>
+    <script type="text/javascript">
+        $().ready(function () {
+            var appender = new Appender();
+            appender.Append = function (line) {
+                $("#console").append("<li>" + line + "</li>");
+            };
+            appender.Clear = function() {
+                $("#console").children().remove();
+            };
+
+
+            var handler = new FizzBuzzCommandHandler(appender);
+            
+            GlobalApplicationBus.Add(handler);
+        });
+
+        $().ready(function () {
+            GlobalApplicationBus.Send("Application starting");
+            
+            $("#runButton").click(function () {
+                GlobalApplicationBus.Send(this.id + " clicked");
+
+                var config = new Configuration(eval('(' + $("#replacements").val() + ')'),// { 3: 'Fizz', 5: 'Buzz', 7: 'Baz' },
+                    $("#lowerBound").val(), $("#upperBound").val());
+                
+                GlobalApplicationBus.Send(new FizzBuzzCommand(config));
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <div class="container ui-widget">
+        <div class="sixteen columns ui-widget-header ui-corner-top">
+            <h1 class="sixteen columns remove-bottom">FizzBuzz Console</h1>
+        </div>
+        <div class="sixteen columns ui-widget-content">
+            <div class="four columns">
+                <input id="replacements" type="text" placeholder="Replacements" value="{ 3: 'Fizz', 5: 'Buzz', 7: 'Baz' }" class="full-width"/>
+                <input id="lowerBound" type="text" placeholder="Lower bound" class="full-width" value="1"/>
+                <input id="upperBound" type="text" placeholder="Upper bound" class="full-width" value="50"/>
+                <button id="runButton" class="full-width">Run!</button>
+            </div>
+            <div class="eleven columns">
+                <ol id="console">
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
